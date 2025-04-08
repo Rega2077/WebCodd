@@ -1,0 +1,13 @@
+# Node
+node_modules/
+.env
+
+# Vite
+client/dist/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
