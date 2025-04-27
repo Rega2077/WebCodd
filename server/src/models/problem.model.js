@@ -26,6 +26,11 @@ const sampleTestCaseSchema = new mongoose.Schema(
   
 const problemSchema = new Schema(
     {
+    problemNumber: {
+      type: Number,
+      unique: true,
+      required: true,
+    },
     title: { 
         type: String, 
         required: true 
@@ -42,6 +47,10 @@ const problemSchema = new Schema(
     tags: { 
         type: [String], 
         default: [] 
+    },
+    starterCode: {
+        type: String, 
+        required: true 
     },
 
     sampleTestCases: [sampleTestCaseSchema], // ✅ shown to the user

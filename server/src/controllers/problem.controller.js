@@ -1,84 +1,109 @@
-import { Problem } from "../models/problem.model.js"
+// Updated problem.controller.js with problemNumber support and tag filtering/search functionality
 
-// Create 
-export const createProblem = async (req, res) => { 
-    try { 
-        const newProblem = await Problem.create(req.body) 
-        res.status(201).json({ 
-            success: true, problem: newProblem 
-        }) 
-    } 
-    catch (error) { 
-        res.status(500).json({
-            success: false, message: error.message 
-        }) 
-    } 
-}
+import { Problem } from "../models/problem.model.js";
 
-// Read All 
-export const getAllProblems = async (req, res) => { 
-    try { 
-        const problems = await Problem.find()
-        .sort({ 
-            createdAt: -1 
-        }) 
-        res.status(200).json({ 
-            success: true, problems 
-        }) 
-    } 
-    catch (error) { 
-        res.status(500).json({ 
-            success: false, message: error.message 
-        }) 
-    } 
-}
+// Create a new problem
+export const createProblem = async (req, res) => {
+    try {
+        const { problemNumber, title, statement, difficulty, tags, sampleTestCases, testCases, starterCode } = req.body;
 
-// Read One 
-export const getProblemById = async (req, res) => { 
-    try { 
-        const problem = await Problem.findById(req.params.id) 
-        if (!problem) return res.status(404).json({ 
-            success: false, message: "Problem not found" 
-        }) 
-        res.status(200).json({ 
-            success: true, problem 
-        }) 
-    } 
-    catch (error) { 
-        res.status(500).json({ 
-            success: false, message: error.message 
-        }) 
-    } 
-}
+        if (!problemNumber || !title || !statement || !difficulty || !starterCode) {
+            return res.status(400).json({ message: "Please provide all required fields." });
+        }
 
-// Update 
-export const updateProblem = async (req, res) => { 
-    try { 
-        const updated = await Problem.findByIdAndUpdate(req.params.id, req.body, { 
-            new: true 
-        }) 
-        res.status(200).json({ 
-            success: true, problem: updated 
-        }) 
-    } 
-    catch (error) { 
-        res.status(500).json({ 
-            success: false, message: error.message 
-        }) 
-    } 
-}
+        const existingProblem = await Problem.findOne({ problemNumber });
+        if (existingProblem) {
+            return res.status(400).json({ message: "Problem number already exists." });
+        }
 
-// Delete 
-export const deleteProblem = async (req, res) => { 
-    try { 
-        await Problem.findByIdAndDelete(req.params.id) 
-        res.status(200).json({ 
-            success: true, message: "Problem deleted" 
-        }) 
-    } 
-    catch (error) { 
-        res.status(500).json({ 
-            success: false, message: error.message 
-        }) 
-    } 
-}
+        const problem = await Problem.create({
+            problemNumber,
+            title,
+            statement,
+            difficulty,
+            tags,
+            sampleTestCases,
+            testCases,
+            starterCode,
+        });
+
+        res.status(201).json({ success: true, problem });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Get all problems with optional tag filtering and search
+export const getAllProblems = async (req, res) => {
+    try {
+        const { tag, search, problemNumber } = req.query;
+        let query = {};
+
+        if (tag) {
+            query.tags = tag;
+        }
+
+        if (search) {
+            query.title = { $regex: search, $options: "i" };
+        }
+
+        if (problemNumber) {
+            query.problemNumber = problemNumber;
+        }
+
+        const problems = await Problem.find(query).sort({ problemNumber: 1 });
+        res.status(200).json({ success: true, problems });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Get a single problem by problemNumber
+export const getProblemByProblemNumber = async (req, res) => {
+    try {
+        const { problemNumber } = req.params;
+        const problem = await Problem.findOne({ problemNumber });
+
+        if (!problem) {
+            return res.status(404).json({ success: false, message: "Problem not found." });
+        }
+
+        res.status(200).json({ success: true, problem });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Update a problem by problemNumber
+export const updateProblem = async (req, res) => {
+    try {
+        const { problemNumber } = req.params;
+        const updates = req.body;
+
+        const updatedProblem = await Problem.findOneAndUpdate({ problemNumber }, updates, { new: true });
+
+        if (!updatedProblem) {
+            return res.status(404).json({ success: false, message: "Problem not found." });
+        }
+
+        res.status(200).json({ success: true, updatedProblem });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Delete a problem by problemNumber
+export const deleteProblem = async (req, res) => {
+    try {
+        const { problemNumber } = req.params;
+        const deletedProblem = await Problem.findOneAndDelete({ problemNumber });
+
+        if (!deletedProblem) {
+            return res.status(404).json({ success: false, message: "Problem not found." });
+        }
+
+        res.status(200).json({ success: true, message: "Problem deleted successfully." });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
