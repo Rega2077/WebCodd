@@ -1,12 +1,24 @@
-import express from "express" 
-import { createProblem, getAllProblems, getProblemById, updateProblem, deleteProblem, } from "../controllers/problem.controller.js"
+import express from "express";
+import { 
+  createProblem, 
+  getAllProblems, 
+  getProblemByProblemNumber, 
+  updateProblem, 
+  deleteProblem 
+} from "../controllers/problem.controller.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.post("/", createProblem) 
-router.get("/", getAllProblems) 
-router.get("/:id", getProblemById) 
-router.put("/:id", updateProblem) 
-router.delete("/:id", deleteProblem)
+// Create a new problem
+router.route("/").post(createProblem);
 
-export default router
+// Get all problems with optional filters
+router.route("/").get(getAllProblems);
+
+// Get, update, delete a single problem by problemNumber
+router.route("/:problemNumber")
+  .get(getProblemByProblemNumber)
+  .put(updateProblem)
+  .delete(deleteProblem);
+
+export default router;
