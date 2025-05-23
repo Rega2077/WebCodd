@@ -3,13 +3,13 @@ import { Twitter, Github, Linkedin } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-black text-gray-300 px-6 sm:px-10 lg:px-28 pt-16 pb-10">
-      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-between gap-10">
+    <footer className="bg-black text-gray-300 px-4 sm:px-8 md:px-12 lg:px-16 pt-16 pb-10 overflow-hidden w-full">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between gap-10">
 
         {/* Logo & Description */}
         <div className="text-center lg:text-left">
           <h3 className="text-3xl font-bold text-purple-400">WebCodd</h3>
-          <p className="mt-4 text-sm max-w-xs text-gray-400">
+          <p className="mt-4 text-sm max-w-xs text-gray-400 mx-auto lg:mx-0">
             Empowering developers through real-world, hands-on frontend challenges and elegant design thinking.
           </p>
         </div>
